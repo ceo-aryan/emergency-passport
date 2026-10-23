@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    // An approved doctor/hospital account
+    function isStaff() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/staff/$(request.auth.uid))
+        && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.status == 'approved';
+    }
+    // The doctor entered the patient's code within the last 30 minutes
+    function hasAccess(patientUid) {
+      let p = /databases/$(database)/documents/access/$(patientUid + '_' + request.auth.uid);
+      return isStaff() && exists(p) && request.time < get(p).data.createdAt + duration.value(30, 'm');
+    }
+
+    // ---- Patient passport ----
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+    match /emergency/{pid} {            // readable only by exact ID (QR); never listable
+      allow get: if true;
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn() && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+    match /lookup/{h} {                 // phone + date of birth pointer
+      allow get: if true;
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn() && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ---- Doctors and hospitals ----
+    match /staff/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.status == 'pending';
+      allow update: if isAdmin();       // only admins can approve or reject
+    }
+    match /admins/{uid} {               // created by hand in the Firebase console
+      allow get: if signedIn() && request.auth.uid == uid;
+    }
+
+    // ---- Verification: patient's code -> doctor's access ----
+    match /codes/{uid}/active/{code} {
+      allow read, create, delete: if signedIn() && request.auth.uid == uid;
+    }
+    match /access/{aid} {
+      allow get: if signedIn() && (resource.data.uid == request.auth.uid || resource.data.docUid == request.auth.uid);
+      allow create, update: if isStaff()
+        && request.resource.data.docUid == request.auth.uid
+        && aid == request.resource.data.uid + '_' + request.auth.uid
+        && request.resource.data.createdAt == request.time
+        // a log entry must be written in the same batch (so every access is recorded)
+        && existsAfter(/databases/$(database)/documents/accessLog/$(request.resource.data.logId))
+        && getAfter(/databases/$(database)/documents/accessLog/$(request.resource.data.logId)).data.uid == request.resource.data.uid
+        && getAfter(/databases/$(database)/documents/accessLog/$(request.resource.data.logId)).data.docUid == request.auth.uid
+        && (
+          // 1) normal access: the patient's 6-digit code, valid for 10 minutes
+          (request.resource.data.mode == 'code'
+            && request.time < get(/databases/$(database)/documents/codes/$(request.resource.data.uid)/active/$(request.resource.data.code)).data.createdAt + duration.value(10, 'm'))
+          // 2) emergency access: needs a written reason, and the patient must not have switched it off
+          || (request.resource.data.mode == 'emergency'
+            && request.resource.data.reason is string && request.resource.data.reason.size() >= 10
+            && get(/databases/$(database)/documents/users/$(request.resource.data.uid)).data.get('allowEmergency', true) != false)
+        );
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+    match /accessLog/{lid} {            // patient can read their own log; nobody can edit or delete it
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isStaff() && request.resource.data.docUid == request.auth.uid
+                    && request.resource.data.at == request.time;
+    }
+
+    // ---- Medical history: append-only, written only by doctors with access ----
+    match /history/{uid}/entries/{eid} {
+      allow read: if signedIn() && (request.auth.uid == uid || hasAccess(uid));
+      allow create: if hasAccess(uid) && request.resource.data.doctorUid == request.auth.uid
+                    && request.resource.data.createdAt == request.time;
+    }
+
+    // ---- Blood donors: visible to logged-in users only; each donor manages their own profile ----
+    match /donors/{uid} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn() && request.auth.uid == uid;
+    }
+  }
+}

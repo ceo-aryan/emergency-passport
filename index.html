@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergency Medical Passport</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/print.css" media="print">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><span class="cross" aria-hidden="true">+</span><span data-i18n="brand"></span></div>
+      <div class="lang" role="group" aria-label="Language / भाषा">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="hi" aria-pressed="false">हिं</button>
+      </div>
+    </div>
+    <nav aria-label="Main">
+      <button type="button" data-go="home" data-i18n="nav_home"></button>
+      <button type="button" data-go="create" data-i18n="nav_create"></button>
+      <button type="button" data-go="lookup" data-i18n="nav_lookup"></button>
+      <button type="button" data-go="staff" data-i18n="nav_staff"></button>
+      <button type="button" data-go="donors" data-i18n="nav_donors"></button>
+      <button type="button" id="navAdmin" data-go="admin" data-i18n="nav_admin" hidden></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== PAGE 1: HOME ===== -->
+  <section id="home" class="view on">
+    <div class="hero">
+      <div>
+        <h1 data-i18n="hero_title"></h1>
+        <p class="muted" data-i18n="hero_sub"></p>
+        <button class="btn" type="button" data-go="create" data-i18n="card1_t"></button>
+      </div>
+      <!-- A sample card so visitors instantly see what the passport looks like -->
+      <div class="pass" aria-hidden="true">
+        <div class="pass-top"><span>+</span><span data-i18n="card_head"></span></div>
+        <div class="pass-body">
+          <div class="id-row"><strong>Ravi Sharma</strong><div class="blood"><small data-i18n="r_blood"></small>B+</div></div>
+          <dl class="rows"><div><dt data-i18n="r_allergy"></dt><dd>Penicillin</dd></div>
+          <div><dt data-i18n="r_cond"></dt><dd>Diabetes</dd></div></dl>
+        </div>
+      </div>
+    </div>
+    <div class="choices">
+      <button class="choice" type="button" data-go="create"><strong data-i18n="card1_t"></strong><span class="muted" data-i18n="card1_d"></span></button>
+      <button class="choice" type="button" data-go="lookup"><strong data-i18n="card2_t"></strong><span class="muted" data-i18n="card2_d"></span></button>
+      <div class="choice soon"><strong data-i18n="card3_t"></strong><span class="muted" data-i18n="card3_d"></span></div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 2: CREATE PASSPORT ===== -->
+  <section id="create" class="view">
+    <h2 data-i18n="form_title"></h2>
+
+    <fieldset id="authBox" hidden>
+      <legend data-i18n="g_login"></legend>
+      <p class="muted" style="margin:0" data-i18n="login_note"></p>
+      <label><span data-i18n="f_email"></span><input id="aemail" type="email" autocomplete="email"></label>
+      <label><span data-i18n="f_pass"></span><input id="apass" type="password" autocomplete="current-password"></label>
+      <p id="authErr" class="err" role="alert"></p>
+      <div class="actions">
+        <button class="btn" type="button" id="loginBtn" data-i18n="btn_login"></button>
+        <button class="btn alt" type="button" id="signupBtn" data-i18n="btn_signup"></button>
+      </div>
+    </fieldset>
+    <div id="whoami" class="note" style="margin:0 0 14px" hidden>
+      <span data-i18n="who_as"></span> <strong id="whoMail"></strong>
+      <button class="btn alt" type="button" id="logout" data-i18n="btn_logout" style="min-height:40px; margin-left:8px"></button>
+    </div>
+
+    <form id="createForm" novalidate>
+      <fieldset>
+        <legend data-i18n="g_you"></legend>
+        <label><span data-i18n="f_name"></span><input id="name" required autocomplete="name"></label>
+        <div class="two">
+          <label><span data-i18n="f_phone"></span><input id="phone" type="tel" inputmode="numeric" maxlength="10" required autocomplete="tel-national"></label>
+          <label><span data-i18n="f_dob"></span><input id="dob" type="date" required></label>
+        </div>
+        <div class="two">
+          <label><span data-i18n="f_gender"></span>
+            <select id="gender"><option value="" data-i18n="select"></option><option value="M" data-i18n="g_m"></option><option value="F" data-i18n="g_f"></option><option value="O" data-i18n="g_o"></option></select></label>
+          <label><span data-i18n="f_blood"></span>
+            <select id="blood" required><option value="" data-i18n="select"></option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="g_health"></legend>
+        <label><span data-i18n="f_allergy"></span><textarea id="allergy" data-i18n-ph="ph_none"></textarea></label>
+        <label><span data-i18n="f_cond"></span><textarea id="cond" data-i18n-ph="ph_none"></textarea></label>
+        <label><span data-i18n="f_meds"></span><textarea id="meds" data-i18n-ph="ph_none"></textarea></label>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="g_contact"></legend>
+        <label><span data-i18n="c_name"></span><input id="cname"></label>
+        <div class="two">
+          <label><span data-i18n="c_phone"></span><input id="cphone" type="tel" inputmode="numeric" maxlength="10"></label>
+          <label><span data-i18n="c_rel"></span><input id="crel"></label>
+        </div>
+      </fieldset>
+
+      <label class="check"><input id="allowEm" type="checkbox" checked><span data-i18n="allow_em"></span></label>
+      <label class="check"><input id="consent" type="checkbox"><span data-i18n="consent"></span></label>
+      <p id="createErr" class="err" role="alert"></p>
+      <button class="btn" type="submit" data-i18n="btn_save"></button>
+    </form>
+    <div id="createDone"></div>
+
+    <div id="myRecords" hidden>
+      <h3 data-i18n="code_title"></h3>
+      <p class="muted" data-i18n="code_note"></p>
+      <button class="btn" type="button" id="genCode" data-i18n="code_btn"></button>
+      <div id="codeOut"></div>
+      <h3 data-i18n="hist_title"></h3>
+      <div id="myHistory"></div>
+      <h3 data-i18n="log_title"></h3>
+      <div id="myLog"></div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 3: EMERGENCY LOOKUP ===== -->
+  <section id="lookup" class="view">
+    <h2 data-i18n="lookup_title"></h2>
+    <p class="muted" data-i18n="lookup_note"></p>
+    <form id="lookupForm" novalidate>
+      <div class="two">
+        <label><span data-i18n="f_phone"></span><input id="lphone" type="tel" inputmode="numeric" maxlength="10"></label>
+        <label><span data-i18n="f_dob"></span><input id="ldob" type="date"></label>
+      </div>
+      <p id="lookupErr" class="err" role="alert"></p>
+      <button class="btn" type="submit" data-i18n="btn_find"></button>
+    </form>
+    <div id="lookupResult" style="margin-top:20px"></div>
+  </section>
+
+  <!-- ===== PAGE 4: OPENED BY SCANNING A QR (not in the menu) ===== -->
+  <section id="scan" class="view">
+    <h2 data-i18n="scan_title"></h2>
+    <p class="muted" data-i18n="scan_note"></p>
+    <div id="scanResult"></div>
+  </section>
+
+  <!-- ===== PAGE 5: DOCTOR / HOSPITAL PORTAL ===== -->
+  <section id="staff" class="view">
+    <h2 data-i18n="staff_title"></h2>
+    <p class="muted" data-i18n="staff_note"></p>
+
+    <div id="staffAuth" class="stack" style="margin-top:0" hidden>
+      <fieldset>
+        <legend data-i18n="st_login"></legend>
+        <label><span data-i18n="f_email"></span><input id="semail" type="email" autocomplete="email"></label>
+        <label><span data-i18n="f_pass"></span><input id="spass" type="password" autocomplete="current-password"></label>
+        <p id="sErr" class="err" role="alert"></p>
+        <div class="actions">
+          <button class="btn" type="button" id="sLogin" data-i18n="btn_login"></button>
+          <button class="btn alt" type="button" id="sShowReg" data-i18n="st_reg_btn"></button>
+        </div>
+      </fieldset>
+      <form id="regForm" hidden novalidate>
+        <fieldset>
+          <legend data-i18n="st_reg_title"></legend>
+          <label><span data-i18n="f_role"></span>
+            <select id="rrole"><option value="doctor" data-i18n="role_doctor"></option><option value="hospital" data-i18n="role_hospital"></option></select></label>
+          <label><span data-i18n="f_sname"></span><input id="rname"></label>
+          <div class="two">
+            <label><span data-i18n="reg_no"></span><input id="rreg"></label>
+            <label><span data-i18n="f_city"></span><input id="rcity"></label>
+          </div>
+          <label><span data-i18n="f_hosp"></span><input id="rhosp"></label>
+          <div class="two">
+            <label><span data-i18n="f_email"></span><input id="remail" type="email" autocomplete="email"></label>
+            <label><span data-i18n="f_pass"></span><input id="rpass" type="password" autocomplete="new-password"></label>
+          </div>
+          <p id="rErr" class="err" role="alert"></p>
+          <button class="btn" type="submit" data-i18n="btn_register"></button>
+        </fieldset>
+      </form>
+    </div>
+
+    <div id="staffBar" class="note" style="margin:0 0 14px" hidden>
+      <span data-i18n="who_as"></span> <strong id="staffWho"></strong>
+      <button class="btn alt" type="button" id="sLogout" data-i18n="btn_logout" style="min-height:40px; margin-left:8px"></button>
+    </div>
+    <p id="staffMsg" class="note" hidden></p>
+
+    <div id="staffApp" hidden>
+      <h3 data-i18n="find_title"></h3>
+      <form id="findForm" novalidate>
+        <div class="two">
+          <label><span data-i18n="f_phone"></span><input id="fphone" type="tel" inputmode="numeric" maxlength="10"></label>
+          <label><span data-i18n="f_dob"></span><input id="fdob" type="date"></label>
+        </div>
+        <p id="findErr" class="err" role="alert"></p>
+        <button class="btn" type="submit" data-i18n="btn_find"></button>
+      </form>
+      <div id="patientBox"></div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: BLOOD DONORS ===== -->
+  <section id="donors" class="view">
+    <h2 data-i18n="d_title"></h2>
+    <div id="donorLoginMsg" class="note" hidden>
+      <span data-i18n="d_login"></span>
+      <button class="btn alt" type="button" data-go="create" data-i18n="d_login_btn" style="min-height:40px; margin-left:8px"></button>
+    </div>
+    <div id="donorApp" hidden>
+      <h3 data-i18n="d_find"></h3>
+      <form id="findDonorForm" novalidate>
+        <div class="two">
+          <label><span data-i18n="f_need"></span><select id="nblood"><option value="" data-i18n="select"></option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></label>
+          <label><span data-i18n="f_city"></span><input id="ncity"></label>
+        </div>
+        <p id="findDErr" class="err" role="alert"></p>
+        <button class="btn" type="submit" data-i18n="d_search"></button>
+      </form>
+      <div id="donorResults" style="margin-top:16px"></div>
+
+      <h3 data-i18n="d_become"></h3>
+      <p class="muted" data-i18n="d_note"></p>
+      <form id="donorForm" novalidate>
+        <fieldset>
+          <div class="two">
+            <label><span data-i18n="f_city"></span><input id="dcity"></label>
+            <label><span data-i18n="f_area"></span><input id="darea"></label>
+          </div>
+          <label><span data-i18n="f_last"></span><input id="dlast" type="date"></label>
+          <label class="check"><input id="davail" type="checkbox" checked><span data-i18n="f_avail"></span></label>
+          <label class="check"><input id="dconsent" type="checkbox"><span data-i18n="d_consent"></span></label>
+        </fieldset>
+        <p id="donorErr" class="err" role="alert"></p>
+        <div class="actions">
+          <button class="btn" type="submit" data-i18n="d_save"></button>
+          <button class="btn alt" type="button" id="donorRemove" data-i18n="d_remove" hidden></button>
+        </div>
+        <p id="donorStatus" class="ok"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 6: ADMIN (menu button appears only for admins) ===== -->
+  <section id="admin" class="view">
+    <h2 data-i18n="ad_title"></h2>
+    <div id="adminList"></div>
+  </section>
+
+</main>
+
+</body>
+</html>

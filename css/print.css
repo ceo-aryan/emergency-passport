@@ -1,0 +1,2 @@
+/* When printing, show only the passport card */
+@media print{header,form,.no-print,.note,h2,h3,.ok,#myRecords,#whoami{display:none!important} .view{padding:0}}

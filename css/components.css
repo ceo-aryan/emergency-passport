@@ -1,0 +1,39 @@
+/* ===== 6. THE PASSPORT CARD (the star of the app) ===== */
+.pass{background:var(--white); border:2px solid var(--ink); border-radius:14px; overflow:hidden}
+.pass-top{background:var(--red); color:var(--white); padding:10px 16px; font-weight:700; display:flex; gap:8px; align-items:center}
+.pass-body{padding:16px; display:grid; gap:14px}
+.id-row{display:flex; gap:14px; align-items:center; justify-content:space-between}
+.blood{
+  flex:0 0 auto; min-width:76px; padding:8px 10px; text-align:center; border-radius:12px;
+  background:var(--red); color:var(--white); font-size:2rem; font-weight:800; line-height:1.1;
+}
+.blood small{display:block; font-size:.7rem; font-weight:600}
+.rows{display:grid; gap:10px; margin:0}
+.rows div{border-top:1px solid var(--mist); padding-top:8px}
+.rows dt{font-size:.85rem; color:#4a6076; font-weight:600}
+.rows dd{margin:0; font-weight:600; overflow-wrap:anywhere}
+.call{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+.qr{width:120px; height:120px; border:2px dashed var(--line); display:grid; place-items:center; text-align:center; font-size:.75rem; color:#4a6076; padding:6px; border-radius:8px}
+.note{background:var(--mist); border-radius:8px; padding:10px 12px; font-size:.9rem; margin-top:14px}
+.ok{color:var(--green); font-weight:700}
+.qrbox{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+#qrcode{padding:8px; background:#fff; border:1px solid var(--line); border-radius:8px; line-height:0}
+#qrcode img,#qrcode canvas{max-width:100%; height:auto}
+.actions{display:flex; gap:8px; flex-wrap:wrap}
+.actions .btn{min-height:44px; padding:0 14px}
+
+/* ===== 7. RECORDS, ENTRIES, DOCTOR PORTAL (Part 4) ===== */
+h3{margin-top:24px}
+.stack{display:grid; gap:14px; margin-top:18px}
+.entry{background:var(--white); border:1px solid var(--line); border-left:5px solid var(--green); border-radius:10px; padding:12px 14px; margin-bottom:10px}
+.entry p{margin:6px 0 0}
+.entry-top{display:flex; gap:8px; justify-content:space-between; align-items:flex-start}
+.tag{background:var(--mist); border-radius:99px; padding:2px 10px; font-size:.8rem; font-weight:600; white-space:nowrap}
+.codebox{font-size:2.2rem; font-weight:800; letter-spacing:.25em; text-align:center; background:var(--white); border:2px dashed var(--ink); border-radius:12px; padding:10px; margin:12px 0 6px}
+.plain{list-style:none; padding:0; margin:0; display:grid; gap:8px}
+.plain li{background:var(--white); border:1px solid var(--line); border-radius:8px; padding:8px 12px}
+
+/* ===== 8. EMERGENCY ACCESS (Part 5) ===== */
+.tag.em{background:var(--red); color:var(--white)}
+.emerg{margin-top:18px; border:1px solid var(--red); border-radius:10px; padding:4px 14px 14px; background:var(--white)}
+.emerg summary{cursor:pointer; font-weight:700; color:var(--red); min-height:44px; display:flex; align-items:center}
